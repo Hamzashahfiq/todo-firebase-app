@@ -1,16 +1,17 @@
-import React, { useState,useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
 import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
 import { styled } from '@mui/material/styles';
 import { useSelector, useDispatch } from 'react-redux';
-import { FetchData,CompTask, UnCompTask, TaskDeleteHandler, CompDeleteHandler, UpdateHandler, showRightBarTask,UnImportantTask,ImportantTask } from '../../store/action/InputDataAction';
+import { FetchData, CompTask, UnCompTask, TaskDeleteHandler, showRightBarTask, UnImportantTask, ImportantTask } from '../../store/action/InputDataAction';
 import './DisplayData.css'
+import LinearLoading from '../linearLoading/LinearLoading'
+import DeleteConfirmation from '../deleteConfirmation/DeleteConfirmation'
 
 
 // Checkbox Lable
@@ -34,47 +35,75 @@ const BootstrapTooltip = styled(({ className, ...props }) => (
 
 
 
-export default function DispalyData({ setInputTask, setIsUpadte, setRightBarOpen, setRightBarCheck }) {
+export default function DispalyData({ uuidGetData, setInputTask, setIsUpadte, setRightBarOpen, setRightBarCheck, setUpdatedData }) {
 
     const dispatch = useDispatch();
     const tasks = useSelector((store) => store.InputDataReducer.tasks)
-    const completedTaskDetail = useSelector((store) => store.InputDataReducer.completedTask)
+    const [taskLoading, setTaskLoading] = useState(false)
+    const [taskDeleteLoading, setTaskDeleteLoading] = useState(false)
+    const [taskDeleteId, setTaskDeleteId] = useState(0)
+    const [dispalyTask, setDisplayTask] = useState(true)
+
+
+
+    // for delete dialog box
+    const [open, setOpen] = React.useState(false);
+
+    const handleClickOpen = (item) => {
+        setOpen(true);
+        setTaskDeleteId(item.docId)
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+
+
+    // for show and hide of tasks
+    useEffect(() => {
+        if (tasks.length === 0) {
+            setDisplayTask(true)
+        } else
+            tasks.find((item) => {
+                if (item.completed === false) {
+                    setDisplayTask(false)
+                }
+                else {
+                    setDisplayTask(true)
+                }
+            })
+    }, [tasks])
+
 
     useEffect(() => {
-        dispatch(FetchData())
-    },[])
+        dispatch(FetchData(setTaskLoading))
+    }, [uuidGetData])
 
     const completedHandler = (item) => {
-        let completedTask = {
-            id: item.id,
-            task: item.task
+        let completedTaskData = {
+                task:item.task,
+                completed: true,
+                important: item.important
         }
-        dispatch(CompTask(completedTask))
-        alert("Change to completed")
-        setRightBarOpen(false)
+        dispatch(CompTask(item.docId,completedTaskData, setRightBarOpen))
     }
     const unCompletedHandler = (item) => {
-        let unCompletedTask = {
-            id: item.id,
-            task: item.task
-        }
-        dispatch(UnCompTask(unCompletedTask))
-        alert("Change to uncompleted task")
-        setRightBarOpen(false)
+        let unCompletedTaskData = {
+            task:item.task,
+            completed: false,
+            important: item.important
     }
-    const deleteHandler = (item) => {
-        console.log(item)
-        dispatch(TaskDeleteHandler(item.id))
-        alert("Deleted")
-        setRightBarOpen(false)
+        dispatch(UnCompTask(item.docId,unCompletedTaskData,setRightBarOpen))
+        
     }
-    const compDeleteHandler = (item) => {
-        dispatch(CompDeleteHandler(item.id))
-        alert("Completed task will be delete")
-        setRightBarOpen(false)
+
+    const deleteHandler = () => {
+        dispatch(TaskDeleteHandler(taskDeleteId, setRightBarOpen, setTaskDeleteLoading, handleClose))
     }
+
     const updateHandler = (item) => {
-        dispatch(UpdateHandler(item))
+        setUpdatedData(item)
         setInputTask(item.task)
         setIsUpadte(true)
         setRightBarOpen(false)
@@ -89,9 +118,9 @@ export default function DispalyData({ setInputTask, setIsUpadte, setRightBarOpen
         setRightBarOpen(true)
         setRightBarCheck(false)
     }
-    
+
     // const unCompImportantHandler = (item,checked) => {
-        
+
     //     if (checked === false) {
     //         let newImportantTask = {
     //             ...item,important:false
@@ -105,7 +134,7 @@ export default function DispalyData({ setInputTask, setIsUpadte, setRightBarOpen
     //         dispatch(UnImportantTask(newImportantTask))
     //         return
     //     }
-       
+
 
     // }
 
@@ -123,18 +152,20 @@ export default function DispalyData({ setInputTask, setIsUpadte, setRightBarOpen
     //         dispatch(ImportantTask(newImportantTask))
     //         return
     //     }
-       
+
     // }
 
-
+    if (taskLoading) {
+        return <LinearLoading />
+    }
 
     return (
         <div>
             <Box sx={{ px: 4, overflowY: 'auto', }} >
-                {tasks.length === 0 ?
-                    null : <Box component='h4' sx={{ my: 1 }}> Tasks  </Box>}
+
+                {dispalyTask ? null : <Box component='h4' sx={{ my: 1 }}> Tasks  </Box>}
                 {tasks.map((item) => {
-                    return (
+                    return (item.completed ? null :
                         <Grid key={item.docId} className='hoverColor' container sx={{ borderBottom: 1, wordWrap: 'break-word', borderColor: '#e0e0e0', minHeight: "fit-content" }}>
 
                             <Grid item xs={1} sx={{ minWidth: '30px', textAlign: 'right', }}><BootstrapTooltip title="Mark as completed" placement="top"><Checkbox onChange={() => completedHandler(item)} sx={{ '& .MuiSvgIcon-root': { fontSize: 20 } }} /></BootstrapTooltip></Grid>
@@ -143,11 +174,11 @@ export default function DispalyData({ setInputTask, setIsUpadte, setRightBarOpen
                                     <Button className='hoverColor' onClick={() => rightBarHandler(item)} sx={{ color: 'black', textTransform: 'none', display: 'inline-block', backgroundColor: 'inherit', border: 0, width: '100%', padding: '7px 7px', textAlign: 'left' }}>{item.task} </Button>
                                 </Box>
                             </Grid>
-                            <Grid item xs={2} sx={{ textAlign: 'right', minWidth: 'fit-content' }}>
+                            <Grid item xs={2} sx={{ textAlign: 'right', minWidth: 'fit-content', }}>
                                 <Tooltip title="Update" placement="bottom"><IconButton aria-label="delete" color="primary" onClick={() => updateHandler(item)}> <EditIcon sx={{ fontSize: 20 }} /></IconButton></Tooltip>
-                                <Tooltip title="Delete" placement="bottom"><IconButton aria-label="delete" color="error" onClick={() => deleteHandler(item)}><DeleteIcon sx={{ fontSize: 20 }} /></IconButton></Tooltip>
-                                 {/* <Checkbox {...label}  onChange={(e)=>unCompImportantHandler(item,e.target.checked)} icon={ <Tooltip title="Mark as important" placement="bottom"><GradeOutlinedIcon/></Tooltip>} checkedIcon={<Tooltip title="Remove importance" placement="bottom"><GradeIcon /></Tooltip>} /> */}
-                              
+                                <DeleteConfirmation deleteHandler={deleteHandler} taskDeleteLoading={taskDeleteLoading} handleClickOpen={() => handleClickOpen(item)} handleClose={handleClose} open={open} />
+                                {/* <Checkbox {...label}  onChange={(e)=>unCompImportantHandler(item,e.target.checked)} icon={ <Tooltip title="Mark as important" placement="bottom"><GradeOutlinedIcon/></Tooltip>} checkedIcon={<Tooltip title="Remove importance" placement="bottom"><GradeIcon /></Tooltip>} /> */}
+
                             </Grid>
 
                         </Grid>
@@ -156,11 +187,11 @@ export default function DispalyData({ setInputTask, setIsUpadte, setRightBarOpen
                 }
 
                 <Box>
-                    {completedTaskDetail.length === 0 ? null : <Box component='h4' sx={{ mb: 1, mt: 2 }}> Completed  </Box>}
+                    {tasks.length === 0 ? null : <Box component='h4' sx={{ mb: 1, mt: 2 }}> Completed  </Box>}
                     {
-                        completedTaskDetail.map((item) => {
-                            return (
-                                <Grid key={item.id} className='hoverColor' container sx={{ borderBottom: 1, wordWrap: 'break-word', borderColor: '#e0e0e0', minHeight: "fit-content", }}>
+                        tasks.map((item) => {
+                            return (item.completed &&
+                                <Grid key={item.docId} className='hoverColor' container sx={{ borderBottom: 1, wordWrap: 'break-word', borderColor: '#e0e0e0', minHeight: "fit-content", }}>
                                     <Grid item xs={1} sx={{ minWidth: '30px', textAlign: 'right', }} ><BootstrapTooltip title="Mark as not completed" placement="top" ><Checkbox onChange={() => unCompletedHandler(item)} defaultChecked sx={{ '& .MuiSvgIcon-root': { fontSize: 20 } }} /></BootstrapTooltip></Grid>
                                     <Grid item xs={9} sx={{ color: 'black', textAlign: 'left' }}>
                                         <Box>
@@ -168,17 +199,17 @@ export default function DispalyData({ setInputTask, setIsUpadte, setRightBarOpen
                                         </Box>
                                     </Grid>
                                     <Grid item xs={2} sx={{ minWidth: 'fit-content', textAlign: 'right', }}>
-                                        <Tooltip title="Delete" placement="bottom"><IconButton aria-label="delete" color="error" onClick={() => compDeleteHandler(item)}><DeleteIcon sx={{ fontSize: 20 }} /></IconButton></Tooltip>
-                                        {/* <Checkbox {...label}  onChange={(e)=>importantHandler(item,e.target.checked)} icon={ <Tooltip title="Mark as important" placement="bottom"><GradeOutlinedIcon/></Tooltip>} checkedIcon={<Tooltip title="Remove importance" placement="bottom"><GradeIcon /></Tooltip>} /> */}
+                                        <DeleteConfirmation deleteHandler={deleteHandler} taskDeleteLoading={taskDeleteLoading} handleClickOpen={() => handleClickOpen(item)} handleClose={handleClose} open={open} />
                                     </Grid>
-                                </Grid>
+                                </Grid >
                             )
                         })
                     }
 
                 </Box>
-            </Box>
-        </div>
+
+            </Box >
+        </div >
     )
 }
 

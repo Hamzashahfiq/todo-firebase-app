@@ -21,7 +21,7 @@ import {
     useWindowHeight,
 } from '@react-hook/window-size'
 import { useSelector,useDispatch } from 'react-redux';
-import {CompTask, UnCompTask,TaskDeleteHandler,CompDeleteHandler } from '../../store/action/InputDataAction'
+import {CompTask, UnCompTask,TaskDeleteHandler } from '../../store/action/InputDataAction'
 
 
 // for tooltip
@@ -76,7 +76,7 @@ export default function RightSideBar({ rightBarCheck, setRightBarOpen,setRightBa
         alert('Task Deleted')
      }
      const compTaskDeletehandler = () =>{
-        dispatch(CompDeleteHandler(taskData.id))
+        dispatch(TaskDeleteHandler(taskData.id))
         handleClose()
         alert('Completed task Deleted')
      }

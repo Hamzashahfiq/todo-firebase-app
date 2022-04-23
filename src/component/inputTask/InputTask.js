@@ -1,4 +1,4 @@
-import React,{useState} from 'react'
+import React, { useState } from 'react'
 import Input from '@mui/material/Input';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
@@ -7,9 +7,10 @@ import Tooltip from '@mui/material/Tooltip';
 import { styled } from '@mui/material/styles';
 import { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
-import {useSelector, useDispatch } from 'react-redux';
-import { InputDataAction,SetUpdateHandler} from '../../store/action/InputDataAction';
-import { v4 as uuidv4 } from 'uuid';
+import { useSelector, useDispatch } from 'react-redux';
+import { InputDataAction, setUpdatedData } from '../../store/action/InputDataAction';
+import CircularLoading from '../circularLoading/CircularLoading'
+
 
 
 // for input
@@ -33,50 +34,49 @@ const BootstrapTooltip = styled(({ className, ...props }) => (
 
 
 
-export default function InputTask({inputTask, setInputTask,isUpdate,setIsUpadte,palceholder}) {
+export default function InputTask({ setUuidGetData, inputTask, setInputTask, isUpdate, setIsUpadte, palceholder, updatedData }) {
     const dispatch = useDispatch();
-    const updatedId = useSelector((store)=> store.InputDataReducer.updateData.id)
-     
-    
+    const [submitLoadding, setSubmitLoadding] = useState(false)
+    const [updatedLoading, setUpdatedLoading] = useState(false)
+
+
     const onSubmitHandler = () => {
         if (!inputTask) {
             alert("please add some task in input field")
             return
         }
         let taskDetail = {
-            id: uuidv4(),
-            task: inputTask
+            task: inputTask,
+            completed: false,
+            important: false
         }
-        dispatch(InputDataAction(taskDetail))
-        setInputTask('')
+        dispatch(InputDataAction(taskDetail, setInputTask, setUuidGetData, setSubmitLoadding))
     }
     const UpdateHandler = () => {
-          let taskDeatail = {
-              id :updatedId,
-              task:inputTask
-          }
-          dispatch(SetUpdateHandler(taskDeatail))
-          setInputTask("")
-          alert('Updated')
-          setIsUpadte(false)
+        let taskDetail = {
+            task: inputTask,
+            completed: updatedData.completed,
+            important: updatedData.important
+        }
+        dispatch(setUpdatedData(updatedData.docId,taskDetail, setInputTask, setIsUpadte,setUpdatedLoading))
     }
 
 
     return (
         <>
-            <Box sx={{ width: '100%', backgroundColor: '#EAEAEA', p: 2,pb:0, borderRadius: '5px', boxSizing: 'border-box', }}>
-                <Input placeholder={palceholder ||'Add a task'} value={inputTask} onChange={(e)=>setInputTask(e.target.value)} sx={{ backgroundColor: 'white', width: '100%', p: 1, pb: 0 }} />
+            <Box sx={{ width: '100%', backgroundColor: '#EAEAEA', p: 2, pb: 0, borderRadius: '5px', boxSizing: 'border-box', }}>
+                <Input placeholder={palceholder || 'Add a task'} value={inputTask} onChange={(e) => setInputTask(e.target.value)} sx={{ backgroundColor: 'white', width: '100%', p: 1, pb: 0 }} />
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Box sx={{ pt:1, px: 1, }}>
-                    <IconButton aria-label="" ><BootstrapTooltip title="Add due date" arrow ><Icon sx={{ color: '#797775' }}>calendar_month</Icon></BootstrapTooltip> </IconButton>
-                    <IconButton aria-label="" sx={{mx:1}} ><BootstrapTooltip title="Remind me" arrow ><Icon sx={{ color: '#797775'}}>notifications_none</Icon></BootstrapTooltip></IconButton>
-                    <IconButton aria-label="" ><BootstrapTooltip title="Repeat" arrow ><Icon sx={{ color: '#797775' }}>event_repeat</Icon></BootstrapTooltip></IconButton>
+                    <Box sx={{ pt: 1, px: 1, }}>
+                        <IconButton aria-label="" ><BootstrapTooltip title="Add due date" arrow ><Icon sx={{ color: '#797775' }}>calendar_month</Icon></BootstrapTooltip> </IconButton>
+                        <IconButton aria-label="" sx={{ mx: 1 }} ><BootstrapTooltip title="Remind me" arrow ><Icon sx={{ color: '#797775' }}>notifications_none</Icon></BootstrapTooltip></IconButton>
+                        <IconButton aria-label="" ><BootstrapTooltip title="Repeat" arrow ><Icon sx={{ color: '#797775' }}>event_repeat</Icon></BootstrapTooltip></IconButton>
                     </Box>
                     <Box sx={{ mt: 2, px: 1, }}>
-                        { isUpdate ?
-                        <Button variant="text" sx={{ textTransform: 'none' }} onClick={UpdateHandler}>Update</Button>:
-                        <Button variant="text" onClick= {onSubmitHandler} sx={{ textTransform: 'none' }}>Add</Button>}
-                        </Box>
+                        {isUpdate ?
+                            updatedLoading?<Button variant="text" sx={{ textTransform: 'none' }}><CircularLoading /></Button>:<Button variant="text" sx={{ textTransform: 'none' }} onClick={UpdateHandler}>Update</Button> :
+                            submitLoadding ? <Button variant="text" sx={{ textTransform: 'none' }}><CircularLoading /></Button> : <Button variant="text" onClick={onSubmitHandler} sx={{ textTransform: 'none' }}>Add</Button>}
+                    </Box>
                 </Box>
             </Box>
         </>

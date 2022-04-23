@@ -1,118 +1,114 @@
 const initialState = {
-    tasks:[],
-    taskDetail:[],
-    completedTask:[],
+    tasks: [],
+    taskDetail: [],
+    completedTask: [],
 
-    updateData:"",
-    rightBarTaskData:""
+    updateData: "",
+    rightBarTaskData: ""
 };
 
 
 export default function InputDataReducer(state = initialState, action) {
     switch (action.type) {
         case "FATCHDATA": {
-           return {
-               ...state,
-               tasks:action.payload
-           }
-       }    
-        
-        case "INPUTDATA": {
-             let newInputTask = [...state.taskDetail,action.payload]
             return {
                 ...state,
-                taskDetail:[...newInputTask],
+                tasks: action.payload
             }
         }
+
+        case "INPUTDATA": {
+            let newInputTask = [...state.tasks, action.payload]
+            return {
+                ...state,
+                tasks: newInputTask,
+            }
+        }
+
         case "DELETEHANDLER": {
-             let newTaskDetail = state.taskDetail.filter((item)=>item.id !== action.payload)
-             return {
+            let newTaskDetail = state.tasks.filter((item) => item.docId !== action.payload)
+            return {
                 ...state,
-                taskDetail:newTaskDetail,
+                tasks: newTaskDetail,
             }
-            
+
         }
-        case "COMPDELETEHANDLER": {
-             let newCompletedTask = state.completedTask.filter((item)=>item.id !== action.payload)
-             return {
-                ...state,
-                completedTask:newCompletedTask,
-            }
-            
-        }
-        case "UNIMPORTANT":{
-            let newtaskDetail = state.taskDetail.map((item)=>{
-                if  (item.id === action.payload.id ) {
+        
+        case "UNIMPORTANT": {
+            let newtaskDetail = state.taskDetail.map((item) => {
+                if (item.id === action.payload.id) {
                     return action.payload
-                }else{
-                 return item
-                }
-            })
-            let newcompletedTask = state.completedTask.map((item)=>{
-                if  (item.id === action.payload.id ) {
-                    return {...action.payload,important:true,importantCheck:true }
-                }else{
-                 return item
-                }
-            })
-         return {
-          ...state,
-          taskDetail:newtaskDetail,
-          completedTask:newcompletedTask
-        }
-      
-      }
-        case "UPDATEHANDLER": {
-               let newUpdateData = action.payload
-             return {
-                ...state,
-                updateData:newUpdateData,
-            }
-            
-        }
-        case "SETUPDATEHANDLER": {
-               let newUpdateData = state.taskDetail.map((item)=>{
-                   if  (item.id === action.payload.id ) {
-                       console.log(action.payload.id)
-                       return action.payload
-                   }else{
+                } else {
                     return item
-                   }
-               })
-              
-             return {
+                }
+            })
+            let newcompletedTask = state.completedTask.map((item) => {
+                if (item.id === action.payload.id) {
+                    return { ...action.payload, important: true, importantCheck: true }
+                } else {
+                    return item
+                }
+            })
+            return {
                 ...state,
-                taskDetail:newUpdateData,
+                taskDetail: newtaskDetail,
+                completedTask: newcompletedTask
             }
-            
+
         }
-        case "COMPLETEDTASK":{
-           let  newTaskDetail =  state.taskDetail.filter((item)=> item.id !== action.payload.id)
-           let  newCompletedTask = [...state.completedTask,action.payload]
-           return {
-            ...state,
-            taskDetail:newTaskDetail,
-            completedTask:newCompletedTask
-          }
-        
+       
+        case "UPDATEHANDLER": {
+            let newUpdateData = state.tasks.map((item) => {
+                if (item.docId === action.payload.docId) {
+                    return action.payload
+                } else {
+                    return item
+                }
+            })
+
+            return {
+                ...state,
+                tasks: newUpdateData,
+            }
+
         }
-        case "UNCOMPLETEDTASK":{
-           let   newCompletedTask=  state.completedTask.filter((item)=> item.id !== action.payload.id)
-           let  newTaskDetail = [...state.taskDetail,action.payload]
-           return {
-            ...state,
-            taskDetail:newTaskDetail,
-            completedTask:newCompletedTask
-          }
-        
+        case "COMPLETEDTASK": {
+            let newUpdateData = state.tasks.map((item) => {
+                if (item.docId === action.payload.docId) {
+                    return action.payload
+                } else {
+                    return item
+                }
+            })
+
+            return {
+                ...state,
+                tasks: newUpdateData,
+            }
+
         }
-        case "RIGHTBARTASK":{
-              let newRightBarTask = action.payload
-           return {
-            ...state,
-            rightBarTaskData: newRightBarTask
-          }
-        
+        case "UNCOMPLETEDTASK": {
+            let newUpdateData = state.tasks.map((item) => {
+                if (item.docId === action.payload.docId) {
+                    return action.payload
+                } else {
+                    return item
+                }
+            })
+
+            return {
+                ...state,
+                tasks: newUpdateData,
+            }
+
+        }
+        case "RIGHTBARTASK": {
+            let newRightBarTask = action.payload
+            return {
+                ...state,
+                rightBarTaskData: newRightBarTask
+            }
+
         }
         default:
             return state;

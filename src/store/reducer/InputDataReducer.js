@@ -1,10 +1,5 @@
 const initialState = {
-    tasks: [],
-    taskDetail: [],
-    completedTask: [],
-
-    updateData: "",
-    rightBarTaskData: ""
+    tasks: []
 };
 
 

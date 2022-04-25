@@ -6,7 +6,7 @@ import { Link, NavLink } from "react-router-dom";
 import { useSelector } from 'react-redux';
 
 export default function LeftNavbar() {
-    const taskLength = useSelector((store) => store.InputDataReducer.taskDetail.length)
+    const taskLength = useSelector((store) => store.InputDataReducer.tasks.length)
   
 
     return (

@@ -10,7 +10,7 @@ import IconButton from '@mui/material/IconButton';
 import { useSelector, useDispatch } from 'react-redux';
 import { InputDataAction, setUpdatedData } from '../../store/action/InputDataAction';
 import CircularLoading from '../circularLoading/CircularLoading'
-
+import { toast } from 'react-toastify';
 
 
 // for input
@@ -34,7 +34,7 @@ const BootstrapTooltip = styled(({ className, ...props }) => (
 
 
 
-export default function InputTask({ setUuidGetData, inputTask, setInputTask, isUpdate, setIsUpadte, palceholder, updatedData }) {
+export default function InputTask({ inputTask, setInputTask, isUpdate, setIsUpadte, palceholder, updatedData }) {
     const dispatch = useDispatch();
     const [submitLoadding, setSubmitLoadding] = useState(false)
     const [updatedLoading, setUpdatedLoading] = useState(false)
@@ -42,7 +42,7 @@ export default function InputTask({ setUuidGetData, inputTask, setInputTask, isU
 
     const onSubmitHandler = () => {
         if (!inputTask) {
-            alert("please add some task in input field")
+            toast.info("Please add some task in input field")
             return
         }
         let taskDetail = {
@@ -50,7 +50,7 @@ export default function InputTask({ setUuidGetData, inputTask, setInputTask, isU
             completed: false,
             important: false
         }
-        dispatch(InputDataAction(taskDetail, setInputTask, setUuidGetData, setSubmitLoadding))
+        dispatch(InputDataAction(taskDetail, setInputTask, setSubmitLoadding))
     }
     const UpdateHandler = () => {
         let taskDetail = {
@@ -61,11 +61,16 @@ export default function InputTask({ setUuidGetData, inputTask, setInputTask, isU
         dispatch(setUpdatedData(updatedData.docId,taskDetail, setInputTask, setIsUpadte,setUpdatedLoading))
     }
 
+   const checkButton = (e) => {
+       if (e.key === "Enter") {
+        onSubmitHandler()
+       }
+   } 
 
     return (
         <>
             <Box sx={{ width: '100%', backgroundColor: '#EAEAEA', p: 2, pb: 0, borderRadius: '5px', boxSizing: 'border-box', }}>
-                <Input placeholder={palceholder || 'Add a task'} value={inputTask} onChange={(e) => setInputTask(e.target.value)} sx={{ backgroundColor: 'white', width: '100%', p: 1, pb: 0 }} />
+                <Input placeholder={palceholder || 'Add a task'} value={inputTask} onKeyPress = {(e) => checkButton(e)} onChange={(e) => setInputTask(e.target.value)} sx={{ backgroundColor: 'white', width: '100%', p: 1, pb: 0 }} />
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Box sx={{ pt: 1, px: 1, }}>
                         <IconButton aria-label="" ><BootstrapTooltip title="Add due date" arrow ><Icon sx={{ color: '#797775' }}>calendar_month</Icon></BootstrapTooltip> </IconButton>

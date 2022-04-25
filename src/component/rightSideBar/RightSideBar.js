@@ -58,12 +58,9 @@ export default function RightSideBar({ rightBarCheck, setRightBarOpen,setRightBa
     const [width, height] = useWindowSize()
     const taskData = useSelector((store) => store.InputDataReducer.rightBarTaskData)
     const dispatch = useDispatch()
-    console.log(taskData)
 
      const unCompletedTaskhandler = () => {
-        dispatch(CompTask(taskData))
-        setRightBarCheck(false)
-        alert('Changed to completed')
+        dispatch(CompTask(taskData.docId,taskData, setRightBarCheck, setRightBarCheck))
      }
      const completedTaskhandler = () => {
         dispatch(UnCompTask(taskData))

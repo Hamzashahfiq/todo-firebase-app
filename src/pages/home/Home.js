@@ -42,7 +42,6 @@ export default function Home() {
   const [isUpdate, setIsUpadte] = useState(false)
   const [rightBarOpen, setRightBarOpen] = useState(false)
   const [rightBarCheck, setRightBarCheck] = useState(true)
-  const [uuidGetData, setUuidGetData] = useState(0)
   const [updatedData, setUpdatedData] = useState("")
  
 
@@ -114,10 +113,10 @@ export default function Home() {
               </Box>
             </Box>
             <Box sx={{ boxSizing: 'border-box', }}>
-              <InputTask updatedData = {updatedData} setUuidGetData = {setUuidGetData} inputTask={inputTask} setInputTask={setInputTask} isUpdate={isUpdate} setIsUpadte={setIsUpadte} />
+              <InputTask updatedData = {updatedData} inputTask={inputTask} setInputTask={setInputTask} isUpdate={isUpdate} setIsUpadte={setIsUpadte} />
             </Box>
             <Box sx={{ boxSizing: 'border-box', overflow: 'auto', height: '100%' }}>
-              <DisplayData setUpdatedData = {setUpdatedData}  uuidGetData = {uuidGetData} setInputTask={setInputTask} setIsUpadte={setIsUpadte} setRightBarOpen={setRightBarOpen} setRightBarCheck={setRightBarCheck} />
+              <DisplayData setUpdatedData = {setUpdatedData}  setInputTask={setInputTask} setIsUpadte={setIsUpadte} setRightBarOpen={setRightBarOpen} setRightBarCheck={setRightBarCheck} />
             </Box>
           </Box>
           {/* right side bar */}

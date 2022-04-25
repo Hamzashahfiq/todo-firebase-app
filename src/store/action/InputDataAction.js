@@ -1,5 +1,5 @@
 import { db } from '../../config/Firebase'
-import { v4 as uuidv4 } from 'uuid';
+import { toast } from 'react-toastify';
 
 export const FetchData = (setTaskLoading) => async (dispatch) => {
   setTaskLoading(true)
@@ -20,7 +20,7 @@ export const FetchData = (setTaskLoading) => async (dispatch) => {
     })
   }
   catch (error) {
-    alert(error)
+    toast.error(error)
   }
   finally {
     setTaskLoading(false)
@@ -30,31 +30,33 @@ export const FetchData = (setTaskLoading) => async (dispatch) => {
 
 
 
-export const InputDataAction = (inputTask, setInputTask, setUuidGetData, setSubmitLoadding) => async (dispatch) => {
+export const InputDataAction = (inputTask, setInputTask, setSubmitLoadding) => async (dispatch) => {
   setSubmitLoadding(true)
   try {
-    await db.collection("todo").add(inputTask)
-    setUuidGetData(uuidv4())
+    let dataRes = await db.collection("todo").add(inputTask)
+    let docId = dataRes.id
     setInputTask('')
-    alert("Task has been added successfully")
+    toast.success("Task has been added successfully")
     dispatch({
       type: "INPUTDATA",
-      payload: inputTask
+      payload: {...inputTask, docId}
     })
 
   }
   catch (error) {
-    alert(error)
+    toast.error(error)
   }
   finally {
     setSubmitLoadding(false)
   }
 }
 
-export const CompTask = (docId,completedTaskData, setRightBarOpen) => async(dispatch) => {
+export const CompTask = (docId,completedTaskData, setRightBarOpen , setCompTaskLoading,setLoadingId) => async(dispatch) => {
   try {
+    setCompTaskLoading(true)
+    setLoadingId(docId)
     await db.collection("todo").doc(docId).update(completedTaskData)
-    alert("Change to completed")
+    toast.success("Change to completed")
     setRightBarOpen(false)
     dispatch({
       type: "COMPLETEDTASK",
@@ -62,14 +64,18 @@ export const CompTask = (docId,completedTaskData, setRightBarOpen) => async(disp
     })
   }
   catch (error) {
-    alert(error)
+    toast.error(error)
   }
-
+  finally{
+    setCompTaskLoading(false)
+  }
 }
-  export const UnCompTask = (docId,unCompletedTaskData,setRightBarOpen) => async(dispatch) => {
+  export const UnCompTask = (docId,unCompletedTaskData,setRightBarOpen,setCompTaskLoading,setLoadingId) => async(dispatch) => {
+    setCompTaskLoading(true)
+    setLoadingId(docId)
     try {
       await db.collection("todo").doc(docId).update(unCompletedTaskData)
-      alert("Change to uncompleted task")
+      toast.success("Change to uncompleted task")
       setRightBarOpen(false)
       dispatch({
         type: "UNCOMPLETEDTASK",
@@ -77,15 +83,17 @@ export const CompTask = (docId,completedTaskData, setRightBarOpen) => async(disp
       })
     }
     catch (error) {
-      alert(error)
+      toast.error(error)
     }
-  
+    finally{
+      setCompTaskLoading(false)
+    }
   }
 export const TaskDeleteHandler = (deletedId, setRightBarOpen, setTaskDeleteLoading, handleClose) => async (dispatch) => {
   setTaskDeleteLoading(true)
   try {
     await db.collection("todo").doc(deletedId).delete()
-    alert("Deleted")
+    toast.success("Successfully Deleted")
     setRightBarOpen(false)
     handleClose()
     dispatch({
@@ -94,7 +102,7 @@ export const TaskDeleteHandler = (deletedId, setRightBarOpen, setTaskDeleteLoadi
     })
   }
   catch (error) {
-    alert(error)
+    toast.error(error)
   }
   finally {
     setTaskDeleteLoading(false)
@@ -107,7 +115,7 @@ export const setUpdatedData = (docId, updatedData, setInputTask, setIsUpadte, se
   try {
     await db.collection("todo").doc(docId).update(updatedData)
     setInputTask("")
-    alert('Updated')
+    toast.error('Successfully Updated')
     setIsUpadte(false)
     dispatch({
       type: "UPDATEHANDLER",
@@ -115,7 +123,7 @@ export const setUpdatedData = (docId, updatedData, setInputTask, setIsUpadte, se
     })
   }
   catch (error) {
-    alert(error)
+    toast.error(error)
   }
   finally {
     setUpdatedLoading(false)

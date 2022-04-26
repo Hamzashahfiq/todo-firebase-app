@@ -97,14 +97,6 @@ export default function InputDataReducer(state = initialState, action) {
             }
 
         }
-        case "RIGHTBARTASK": {
-            let newRightBarTask = action.payload
-            return {
-                ...state,
-                rightBarTaskData: newRightBarTask
-            }
-
-        }
         default:
             return state;
     }

@@ -79,8 +79,8 @@ export default function InputTask({ inputTask, setInputTask, isUpdate, setIsUpad
                     </Box>
                     <Box sx={{ mt: 2, px: 1, }}>
                         {isUpdate ?
-                            updatedLoading?<Button variant="text" sx={{ textTransform: 'none' }}><CircularLoading /></Button>:<Button variant="text" sx={{ textTransform: 'none' }} onClick={UpdateHandler}>Update</Button> :
-                            submitLoadding ? <Button variant="text" sx={{ textTransform: 'none' }}><CircularLoading /></Button> : <Button variant="text" onClick={onSubmitHandler} sx={{ textTransform: 'none' }}>Add</Button>}
+                            updatedLoading?<Button variant="text" sx={{ textTransform: 'none' }}><CircularLoading customStyle={{padding: '2px 8px'}} /></Button>:<Button variant="text" sx={{ textTransform: 'none' }} onClick={UpdateHandler}>Update</Button> :
+                            submitLoadding ? <Button variant="text" sx={{ textTransform: 'none' }}><CircularLoading customStyle={{padding: '2px 8px'}} /></Button> : <Button variant="text" onClick={onSubmitHandler} sx={{ textTransform: 'none' }}>Add</Button>}
                     </Box>
                 </Box>
             </Box>

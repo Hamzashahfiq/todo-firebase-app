@@ -20,8 +20,9 @@ import {
     useWindowWidth,
     useWindowHeight,
 } from '@react-hook/window-size'
-import { useSelector,useDispatch } from 'react-redux';
-import {CompTask, UnCompTask,TaskDeleteHandler } from '../../store/action/InputDataAction'
+import { useDispatch } from 'react-redux';
+import { CompTask, UnCompTask, TaskDeleteHandler } from '../../store/action/InputDataAction'
+import CircularLoading from '../circularLoading/CircularLoading';
 
 
 // for tooltip
@@ -47,7 +48,7 @@ const style = {
 };
 
 
-export default function RightSideBar({ rightBarCheck, setRightBarOpen,setRightBarCheck }) {
+export default function RightSideBar({ clickedItem, setClickedItem, rightBarCheck, setRightBarOpen, setRightBarCheck, taskDeleteLoading, setTaskDeleteLoading, setCompTaskLoading, compTaskLoading, setLoadingId }) {
     const [open, setOpen] = React.useState(true);
     const handleOpen = () => setOpen(true);
     const handleClose = () => {
@@ -56,42 +57,44 @@ export default function RightSideBar({ rightBarCheck, setRightBarOpen,setRightBa
     };
 
     const [width, height] = useWindowSize()
-    const taskData = useSelector((store) => store.InputDataReducer.rightBarTaskData)
     const dispatch = useDispatch()
 
-     const unCompletedTaskhandler = () => {
-        dispatch(CompTask(taskData.docId,taskData, setRightBarCheck, setRightBarCheck))
-     }
-     const completedTaskhandler = () => {
-        dispatch(UnCompTask(taskData))
-        setRightBarCheck(true)
-        alert('Changed to uncompleted')
-     }
-     const uncompDeletehandler = () =>{
-        dispatch(TaskDeleteHandler(taskData.id))
-        handleClose()
-        alert('Task Deleted')
-     }
-     const compTaskDeletehandler = () =>{
-        dispatch(TaskDeleteHandler(taskData.id))
-        handleClose()
-        alert('Completed task Deleted')
-     }
+
+    const unCompletedTaskhandler = () => {
+        let completedTaskData = {
+            task: clickedItem.task,
+            completed: true,
+            important: clickedItem.important
+        }
+        dispatch(CompTask(clickedItem.docId, completedTaskData, setCompTaskLoading, setLoadingId, setRightBarCheck))
+    }
+    const completedTaskhandler = () => {
+        let unCompletedTaskData = {
+            task: clickedItem.task,
+            completed: false,
+            important: clickedItem.important
+        }
+
+        dispatch(UnCompTask(clickedItem.docId, unCompletedTaskData, setCompTaskLoading, setLoadingId, setRightBarCheck))
+    }
+    const deletehandler = () => {
+        dispatch(TaskDeleteHandler(clickedItem.docId, setRightBarOpen, setTaskDeleteLoading, handleClose))
+    }
 
     return (
         <>
             {width >= 900 ?
                 <Box sx={{ height: '100%', minWidth: '300px', maxWidth: '300px', px: 1, pt: 8, boxSizing: 'border-box', bgcolor: '#EAEAEA', display: 'flex', flexDirection: 'column' }}>
-                    <Box sx={{ flexGrow: 1,overflowY: 'auto'}} >
+                    <Box sx={{ flexGrow: 1, overflowY: 'auto' }} >
                         <Paper sx={{ my: 1 }} >
                             {rightBarCheck ?
                                 <Box sx={{ display: 'flex', }}>
-                                    <Box><BootstrapTooltip title="Mark as Completed" placement='top' ><Checkbox checked={false} onChange={unCompletedTaskhandler} /></BootstrapTooltip> </Box>
-                                    <Box component='p' sx={{ wordWrap: 'break-word', typography: 'subtitle2', overflow: 'auto', m: 0, pt: '11px', px: 1 }}>{taskData.task} </Box>
+                                    {compTaskLoading ? <CircularLoading customStyle={{ padding: '11px' }} /> : <Box><BootstrapTooltip title="Mark as Completed" placement='top' ><Checkbox checked={false} onChange={unCompletedTaskhandler} /></BootstrapTooltip> </Box>}
+                                    <Box component='p' sx={{ wordWrap: 'break-word', typography: 'subtitle2', overflow: 'auto', m: 0, pt: '11px', px: 1 }}>{clickedItem.task} </Box>
                                 </Box>
                                 : <Box sx={{ display: 'flex' }}>
-                                    <Box><BootstrapTooltip title="Mark as uncompleted" placement='top' ><Checkbox checked={true} onChange={completedTaskhandler} /></BootstrapTooltip> </Box>
-                                    <Box component='p' sx={{ wordWrap: 'break-word', typography: 'subtitle2', overflow: 'auto', m: 0, px: 1, pt: '11px' }}><del> {taskData.task}</del></Box>
+                                    {compTaskLoading ? <CircularLoading customStyle={{ padding: '11px' }} /> : <Box><BootstrapTooltip title="Mark as uncompleted" placement='top' ><Checkbox checked={true} onChange={completedTaskhandler} /></BootstrapTooltip> </Box>}
+                                    <Box component='p' sx={{ wordWrap: 'break-word', typography: 'subtitle2', overflow: 'auto', m: 0, px: 1, pt: '11px' }}><del> {clickedItem.task}</del></Box>
                                 </Box>
                             }
                             <Box sx={{ pl: 1, position: 'relative', color: '#757de8' }} > <AddIcon /><Box style={{ position: 'absolute', left: '50px', display: 'inline-Block', }}>Add step</Box></Box>
@@ -118,10 +121,7 @@ export default function RightSideBar({ rightBarCheck, setRightBarOpen,setRightBa
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                         <BootstrapTooltip title="Click for hide" placement='top'><IconButton aria-label="hide" onClick={handleClose}><ExitToAppIcon /></IconButton></BootstrapTooltip>
-                        {rightBarCheck ?
-                            <BootstrapTooltip title="Delete selected task" placement='top'><IconButton aria-label="Delete" onClick={uncompDeletehandler} sx={{color:'red'}}><DeleteIcon /></IconButton></BootstrapTooltip>
-                            : <BootstrapTooltip title="Delete selected task" placement='top'><IconButton aria-label="Delete" onClick={compTaskDeletehandler} sx={{color:'red'}}><DeleteIcon /></IconButton></BootstrapTooltip>
-                        }
+                        {taskDeleteLoading ? <IconButton aria-label="Delete" onClick={deletehandler} sx={{ color: 'red' }}><CircularLoading /></IconButton> : <BootstrapTooltip title="Delete selected task" placement='top'><IconButton aria-label="Delete" onClick={deletehandler} sx={{ color: 'red' }}><DeleteIcon /></IconButton></BootstrapTooltip>}
                     </Box>
                 </Box> :
                 <div>
@@ -136,13 +136,13 @@ export default function RightSideBar({ rightBarCheck, setRightBarOpen,setRightBa
                                 <Box sx={{ flexGrow: 1 }} >
                                     <Paper sx={{ my: 1 }} >
                                         {rightBarCheck ?
-                                            <Box sx={{ display: 'flex' }}>
-                                                <Box><BootstrapTooltip title="Mark as Completed" placement='top' ><Checkbox checked={false} onChange={unCompletedTaskhandler} /></BootstrapTooltip> </Box>
-                                                <Box component='p' sx={{ wordWrap: 'break-word', typography: 'subtitle2', overflow: 'auto', m: 0, pt: '11px', px: 1 }}>{taskData.task} </Box>
+                                            <Box sx={{ display: 'flex', }}>
+                                                {compTaskLoading ? <CircularLoading customStyle={{ padding: '11px' }} /> : <Box><BootstrapTooltip title="Mark as Completed" placement='top' ><Checkbox checked={false} onChange={unCompletedTaskhandler} /></BootstrapTooltip> </Box>}
+                                                <Box component='p' sx={{ wordWrap: 'break-word', typography: 'subtitle2', overflow: 'auto', m: 0, pt: '11px', px: 1 }}>{clickedItem.task} </Box>
                                             </Box>
                                             : <Box sx={{ display: 'flex' }}>
-                                                <Box><BootstrapTooltip title="Mark as uncompleted" placement='top' ><Checkbox checked={true} onChange={completedTaskhandler} /></BootstrapTooltip> </Box>
-                                                <Box component='p' sx={{ wordWrap: 'break-word', typography: 'subtitle2', overflow: 'auto', m: 0, px: 1, pt: '11px' }}><del> {taskData.task}</del></Box>
+                                                {compTaskLoading ? <CircularLoading customStyle={{ padding: '11px' }} /> : <Box><BootstrapTooltip title="Mark as uncompleted" placement='top' ><Checkbox checked={true} onChange={completedTaskhandler} /></BootstrapTooltip> </Box>}
+                                                <Box component='p' sx={{ wordWrap: 'break-word', typography: 'subtitle2', overflow: 'auto', m: 0, px: 1, pt: '11px' }}><del> {clickedItem.task}</del></Box>
                                             </Box>
                                         }
                                         <Box sx={{ pl: 1, position: 'relative', color: '#757de8' }} > <AddIcon /><Box style={{ position: 'absolute', left: '50px', display: 'inline-Block', }}>Add step</Box></Box>
@@ -169,10 +169,9 @@ export default function RightSideBar({ rightBarCheck, setRightBarOpen,setRightBa
                                 </Box>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                     <BootstrapTooltip title="Click for hide" placement='top'><IconButton aria-label="hide" onClick={handleClose}><ExitToAppIcon /></IconButton></BootstrapTooltip>
-                                    {rightBarCheck ?
-                                        <BootstrapTooltip title="Delete selected task" placement='top'><IconButton aria-label="Delete" onClick={uncompDeletehandler} sx={{color:'red'}} ><DeleteIcon /></IconButton></BootstrapTooltip>
-                                        : <BootstrapTooltip title="Delete selected task" placement='top'><IconButton aria-label="Delete" onClick={compTaskDeletehandler} sx={{color:'red'}}><DeleteIcon /></IconButton></BootstrapTooltip>
-                                    }
+                                    {taskDeleteLoading ? <IconButton aria-label="Delete" onClick={deletehandler} sx={{ color: 'red' }}><CircularLoading /></IconButton> : <BootstrapTooltip title="Delete selected task" placement='top'><IconButton aria-label="Delete" onClick={deletehandler} sx={{ color: 'red' }}><DeleteIcon /></IconButton></BootstrapTooltip>}
+
+
                                 </Box>
                             </Box>
                         </Box>

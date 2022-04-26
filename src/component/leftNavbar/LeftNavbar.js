@@ -1,4 +1,4 @@
-import React from 'react'
+import React , {useState, useEffect} from 'react'
 import { SideBarData } from '../../constant/SideBarData';
 import './LeftNavbar.css'
 import Box from '@mui/material/Box';
@@ -6,7 +6,19 @@ import { Link, NavLink } from "react-router-dom";
 import { useSelector } from 'react-redux';
 
 export default function LeftNavbar() {
-    const taskLength = useSelector((store) => store.InputDataReducer.tasks.length)
+    const [taskLength , setTaskLength] = useState(0)
+    const tasks = useSelector((store) => store.InputDataReducer.tasks)
+
+
+    useEffect(() => {
+        let task = tasks.filter((item) => {
+            return item.completed === false
+        })
+
+        setTaskLength(task.length)
+       
+           
+    })
   
 
     return (

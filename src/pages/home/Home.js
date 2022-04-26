@@ -43,7 +43,12 @@ export default function Home() {
   const [rightBarOpen, setRightBarOpen] = useState(false)
   const [rightBarCheck, setRightBarCheck] = useState(true)
   const [updatedData, setUpdatedData] = useState("")
- 
+  const [compTaskLoading, setCompTaskLoading] = useState(false)
+  const [loadingId, setLoadingId] = useState(false)
+  const [taskDeleteLoading, setTaskDeleteLoading] = useState(false)
+  const [clickedItem , setClickedItem ] = useState("")
+
+
 
   // model Function
   const handleOpen = () => setOpen(true);
@@ -106,22 +111,22 @@ export default function Home() {
                   </IconButton>
                 </Box>}
               <Box component='span' sx={{ paddingTop: '11px', pl: 1, typography: 'h5', display: 'inline-block' }} >
-                  My Day
+                My Day
                 <Box component="p" sx={{ typography: 'caption', ml: 1, color: '#797775' }}>
                   {dayName}, {monthName} {currentDate}
                 </Box>
               </Box>
             </Box>
             <Box sx={{ boxSizing: 'border-box', }}>
-              <InputTask updatedData = {updatedData} inputTask={inputTask} setInputTask={setInputTask} isUpdate={isUpdate} setIsUpadte={setIsUpadte} />
+              <InputTask updatedData={updatedData} inputTask={inputTask} setInputTask={setInputTask} isUpdate={isUpdate} setIsUpadte={setIsUpadte} />
             </Box>
             <Box sx={{ boxSizing: 'border-box', overflow: 'auto', height: '100%' }}>
-              <DisplayData setUpdatedData = {setUpdatedData}  setInputTask={setInputTask} setIsUpadte={setIsUpadte} setRightBarOpen={setRightBarOpen} setRightBarCheck={setRightBarCheck} />
+              <DisplayData setClickedItem = {setClickedItem}  setUpdatedData={setUpdatedData} taskDeleteLoading = {taskDeleteLoading} setTaskDeleteLoading = {setTaskDeleteLoading} loadingId={loadingId} setLoadingId={setLoadingId} compTaskLoading={compTaskLoading} setCompTaskLoading={setCompTaskLoading} setInputTask={setInputTask} setIsUpadte={setIsUpadte} setRightBarOpen={setRightBarOpen} setRightBarCheck={setRightBarCheck} />
             </Box>
           </Box>
           {/* right side bar */}
           {rightBarOpen &&
-            <RightSideBar rightBarCheck={rightBarCheck} setRightBarCheck={setRightBarCheck} setRightBarOpen={setRightBarOpen} />
+            <RightSideBar clickedItem = {clickedItem}  setClickedItem = {setClickedItem}   rightBarCheck={rightBarCheck} setLoadingId={setLoadingId} taskDeleteLoading = {taskDeleteLoading} setTaskDeleteLoading = {setTaskDeleteLoading} compTaskLoading = {compTaskLoading} setCompTaskLoading={setCompTaskLoading} setRightBarCheck={setRightBarCheck} setRightBarOpen={setRightBarOpen} />
           }
         </Box>
       </Box>

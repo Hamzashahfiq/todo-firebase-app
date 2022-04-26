@@ -39,7 +39,7 @@ export const InputDataAction = (inputTask, setInputTask, setSubmitLoadding) => a
     toast.success("Task has been added successfully")
     dispatch({
       type: "INPUTDATA",
-      payload: {...inputTask, docId}
+      payload: { ...inputTask, docId }
     })
 
   }
@@ -51,44 +51,47 @@ export const InputDataAction = (inputTask, setInputTask, setSubmitLoadding) => a
   }
 }
 
-export const CompTask = (docId,completedTaskData, setRightBarOpen , setCompTaskLoading,setLoadingId) => async(dispatch) => {
+export const CompTask = (docId, completedTaskData, setCompTaskLoading, setLoadingId, setRightBarCheck) => async (dispatch) => {
   try {
     setCompTaskLoading(true)
     setLoadingId(docId)
     await db.collection("todo").doc(docId).update(completedTaskData)
     toast.success("Change to completed")
-    setRightBarOpen(false)
+    setRightBarCheck(false)
+
     dispatch({
       type: "COMPLETEDTASK",
-      payload: {...completedTaskData,  docId}
+      payload: { ...completedTaskData, docId }
     })
   }
   catch (error) {
     toast.error(error)
   }
-  finally{
+  finally {
     setCompTaskLoading(false)
+
   }
 }
-  export const UnCompTask = (docId,unCompletedTaskData,setRightBarOpen,setCompTaskLoading,setLoadingId) => async(dispatch) => {
-    setCompTaskLoading(true)
-    setLoadingId(docId)
-    try {
-      await db.collection("todo").doc(docId).update(unCompletedTaskData)
-      toast.success("Change to uncompleted task")
-      setRightBarOpen(false)
-      dispatch({
-        type: "UNCOMPLETEDTASK",
-        payload: {...unCompletedTaskData,  docId}
-      })
-    }
-    catch (error) {
-      toast.error(error)
-    }
-    finally{
-      setCompTaskLoading(false)
-    }
+export const UnCompTask = (docId, unCompletedTaskData, setCompTaskLoading, setLoadingId, setRightBarCheck) => async (dispatch) => {
+  setCompTaskLoading(true)
+  setLoadingId(docId)
+  try {
+    await db.collection("todo").doc(docId).update(unCompletedTaskData)
+    toast.success("Change to uncompleted task")
+    setRightBarCheck(true)
+    dispatch({
+      type: "UNCOMPLETEDTASK",
+      payload: { ...unCompletedTaskData, docId }
+    })
   }
+  catch (error) {
+    toast.error(error)
+  }
+  finally {
+    setCompTaskLoading(false)
+
+  }
+}
 export const TaskDeleteHandler = (deletedId, setRightBarOpen, setTaskDeleteLoading, handleClose) => async (dispatch) => {
   setTaskDeleteLoading(true)
   try {
@@ -129,12 +132,9 @@ export const setUpdatedData = (docId, updatedData, setInputTask, setIsUpadte, se
     setUpdatedLoading(false)
   }
 }
-export function showRightBarTask(taskData) {
-  return {
-    type: "RIGHTBARTASK",
-    payload: taskData
-  }
-}
+
+
+
 export function UnImportantTask(UnImportanttaskData) {
   return {
     type: "UNIMPORTANT",

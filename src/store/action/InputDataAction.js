@@ -92,13 +92,13 @@ export const UnCompTask = (docId, unCompletedTaskData, setCompTaskLoading, setLo
 
   }
 }
-export const TaskDeleteHandler = (deletedId, setRightBarOpen, setTaskDeleteLoading, handleClose) => async (dispatch) => {
+export const TaskDeleteHandler = (deletedId, setRightBarOpen, setTaskDeleteLoading, handleDeleteClose) => async (dispatch) => {
   setTaskDeleteLoading(true)
   try {
     await db.collection("todo").doc(deletedId).delete()
     toast.success("Successfully Deleted")
     setRightBarOpen(false)
-    handleClose()
+    handleDeleteClose()
     dispatch({
       type: "DELETEHANDLER",
       payload: deletedId

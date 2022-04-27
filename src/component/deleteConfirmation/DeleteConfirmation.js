@@ -7,7 +7,8 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
-import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
+import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
+import { styled } from '@mui/material/styles';
 import CircularLoading from '../circularLoading/CircularLoading';
 
 
@@ -26,7 +27,19 @@ import CircularLoading from '../circularLoading/CircularLoading';
 //   return <Slide direction="up" ref={ref} {...props} />;
 // });
 
-export default function AlertDialogSlide({title, text, deleteHandler, taskDeleteLoading, handleClickOpen , handleClose,open}) {
+// for tooltip
+const BootstrapTooltip = styled(({ className, ...props }) => (
+    <Tooltip {...props} arrow classes={{ popper: className }} />
+))(({ theme }) => ({
+    [`& .${tooltipClasses.arrow}`]: {
+        color: theme.palette.common.black,
+    },
+    [`& .${tooltipClasses.tooltip}`]: {
+        backgroundColor: theme.palette.common.black,
+    },
+}));
+
+export default function DeleteConfirmation({title, text, deleteHandler, taskDeleteLoading,deleteOpen, handleDeleteOpen, handleDeleteClose}) {
     // const [open, setOpen] = React.useState(false);
 
     // const handleClickOpen = () => {
@@ -43,11 +56,11 @@ export default function AlertDialogSlide({title, text, deleteHandler, taskDelete
         Slide in alert dialog
       </Button> */}
 
-            <Tooltip title="Delete" placement="bottom"><IconButton aria-label="delete" color="error" onClick={handleClickOpen}><DeleteIcon sx={{ fontSize: 20 }} /></IconButton></Tooltip>
+            <BootstrapTooltip title="Delete" placement="bottom"><IconButton aria-label="delete" color="error" onClick={handleDeleteOpen}><DeleteIcon sx={{ fontSize: 20 }} /></IconButton></BootstrapTooltip>
             <Dialog
-                open={open}
+                open={deleteOpen}
                 keepMounted
-                onClose={handleClose}
+                onClose={handleDeleteClose}
                 aria-describedby="alert-dialog-slide-description"
             >
                 <DialogTitle>{ title ||"Are you sure?"}</DialogTitle>
@@ -57,7 +70,7 @@ export default function AlertDialogSlide({title, text, deleteHandler, taskDelete
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>Cancel</Button>
+                    <Button onClick={handleDeleteClose}>Cancel</Button>
                     {taskDeleteLoading? <Button ><CircularLoading color = "red" /></Button> : <Button onClick={deleteHandler} sx={{color:'red'}}>Delete</Button>}
                 </DialogActions>
             </Dialog>

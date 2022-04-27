@@ -34,10 +34,11 @@ const BootstrapTooltip = styled(({ className, ...props }) => (
 
 
 
-export default function InputTask({ inputTask, setInputTask, isUpdate, setIsUpadte, palceholder, updatedData }) {
+export default function InputTask({checkEnterFlage, setCheckEnterFlage, inputTask, setInputTask, isUpdate, setIsUpadte, palceholder, updatedData }) {
     const dispatch = useDispatch();
     const [submitLoadding, setSubmitLoadding] = useState(false)
     const [updatedLoading, setUpdatedLoading] = useState(false)
+   
 
 
     const onSubmitHandler = () => {
@@ -59,11 +60,17 @@ export default function InputTask({ inputTask, setInputTask, isUpdate, setIsUpad
             important: updatedData.important
         }
         dispatch(setUpdatedData(updatedData.docId,taskDetail, setInputTask, setIsUpadte,setUpdatedLoading))
+        setCheckEnterFlage(false)
     }
 
    const checkButton = (e) => {
        if (e.key === "Enter") {
-        onSubmitHandler()
+         if(checkEnterFlage) {
+            UpdateHandler() 
+         }else{
+            onSubmitHandler()
+         }
+        
        }
    } 
 

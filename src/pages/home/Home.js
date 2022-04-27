@@ -9,6 +9,9 @@ import { useWindowSize, useWindowWidth, useWindowHeight } from '@react-hook/wind
 import Modal from '@mui/material/Modal';
 import DisplayData from '../../component/displayData/DisplayData'
 import RightSideBar from '../../component/rightSideBar/RightSideBar';
+import { useSelector, useDispatch } from 'react-redux';
+import { TaskDeleteHandler } from '../../store/action/InputDataAction';
+
 
 
 
@@ -46,10 +49,29 @@ export default function Home() {
   const [compTaskLoading, setCompTaskLoading] = useState(false)
   const [loadingId, setLoadingId] = useState(false)
   const [taskDeleteLoading, setTaskDeleteLoading] = useState(false)
-  const [clickedItem , setClickedItem ] = useState("")
+  const [clickedItem, setClickedItem] = useState("")
+  const [checkEnterFlage, setCheckEnterFlage] = useState(false)
+  const [taskDeleteId, setTaskDeleteId] = useState(0)
+
+  const dispatch = useDispatch();
 
 
+  // for delete dialog box
+  const [deleteOpen, setDeleteOpen] = React.useState(false);
 
+  const handleDeleteOpen = (item) => {
+    setDeleteOpen(true);
+    setTaskDeleteId(item.docId)
+  };
+
+  const handleDeleteClose = () => {
+    setDeleteOpen(false);
+  };
+
+  const rigthBarHandleDeleteOpen = () => {
+    setDeleteOpen(true);
+    setTaskDeleteId(clickedItem.docId)
+  };
   // model Function
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
@@ -61,6 +83,10 @@ export default function Home() {
     setleftWindowOpen(true)
     setOpen(true)
   }
+
+  const deleteHandler = () => {
+    dispatch(TaskDeleteHandler(taskDeleteId,setRightBarOpen, setTaskDeleteLoading, handleDeleteClose ))
+}
   return (
     <>
       <Navbar />
@@ -118,15 +144,15 @@ export default function Home() {
               </Box>
             </Box>
             <Box sx={{ boxSizing: 'border-box', }}>
-              <InputTask updatedData={updatedData} inputTask={inputTask} setInputTask={setInputTask} isUpdate={isUpdate} setIsUpadte={setIsUpadte} />
+              <InputTask checkEnterFlage={checkEnterFlage} setCheckEnterFlage={setCheckEnterFlage} updatedData={updatedData} inputTask={inputTask} setInputTask={setInputTask} isUpdate={isUpdate} setIsUpadte={setIsUpadte} />
             </Box>
             <Box sx={{ boxSizing: 'border-box', overflow: 'auto', height: '100%' }}>
-              <DisplayData setClickedItem = {setClickedItem}  setUpdatedData={setUpdatedData} taskDeleteLoading = {taskDeleteLoading} setTaskDeleteLoading = {setTaskDeleteLoading} loadingId={loadingId} setLoadingId={setLoadingId} compTaskLoading={compTaskLoading} setCompTaskLoading={setCompTaskLoading} setInputTask={setInputTask} setIsUpadte={setIsUpadte} setRightBarOpen={setRightBarOpen} setRightBarCheck={setRightBarCheck} />
+              <DisplayData deleteHandler = {deleteHandler} deleteOpen = {deleteOpen} handleDeleteOpen ={handleDeleteOpen} handleDeleteClose = {handleDeleteClose} setCheckEnterFlage={setCheckEnterFlage} setClickedItem={setClickedItem} setUpdatedData={setUpdatedData} taskDeleteLoading={taskDeleteLoading} setTaskDeleteLoading={setTaskDeleteLoading} loadingId={loadingId} setLoadingId={setLoadingId} compTaskLoading={compTaskLoading} setCompTaskLoading={setCompTaskLoading} setInputTask={setInputTask} setIsUpadte={setIsUpadte} setRightBarOpen={setRightBarOpen} setRightBarCheck={setRightBarCheck} />
             </Box>
           </Box>
           {/* right side bar */}
           {rightBarOpen &&
-            <RightSideBar clickedItem = {clickedItem}  setClickedItem = {setClickedItem}   rightBarCheck={rightBarCheck} setLoadingId={setLoadingId} taskDeleteLoading = {taskDeleteLoading} setTaskDeleteLoading = {setTaskDeleteLoading} compTaskLoading = {compTaskLoading} setCompTaskLoading={setCompTaskLoading} setRightBarCheck={setRightBarCheck} setRightBarOpen={setRightBarOpen} />
+            <RightSideBar deleteHandler = {deleteHandler}  deleteOpen = {deleteOpen} handleDeleteOpen ={rigthBarHandleDeleteOpen} handleDeleteClose = {handleDeleteClose} clickedItem={clickedItem} setClickedItem={setClickedItem} rightBarCheck={rightBarCheck} setLoadingId={setLoadingId} taskDeleteLoading={taskDeleteLoading} setTaskDeleteLoading={setTaskDeleteLoading} compTaskLoading={compTaskLoading} setCompTaskLoading={setCompTaskLoading} setRightBarCheck={setRightBarCheck} setRightBarOpen={setRightBarOpen} />
           }
         </Box>
       </Box>

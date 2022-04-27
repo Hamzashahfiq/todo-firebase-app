@@ -3,12 +3,12 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import EditIcon from '@mui/icons-material/Edit';
 import IconButton from '@mui/material/IconButton';
-import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
+import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
 import { styled } from '@mui/material/styles';
 import { useSelector, useDispatch } from 'react-redux';
-import { FetchData, CompTask, UnCompTask, TaskDeleteHandler, showRightBarTask, UnImportantTask, ImportantTask } from '../../store/action/InputDataAction';
+import { FetchData, CompTask, UnCompTask, TaskDeleteHandler, UnImportantTask, ImportantTask } from '../../store/action/InputDataAction';
 import './DisplayData.css'
 import LinearLoading from '../linearLoading/LinearLoading'
 import DeleteConfirmation from '../deleteConfirmation/DeleteConfirmation'
@@ -33,31 +33,42 @@ const BootstrapTooltip = styled(({ className, ...props }) => (
     },
 }));
 
+// for tooltip
+const BootstrapTooltipupdated = styled(({ className, ...props }) => (
+    <Tooltip {...props} arrow classes={{ popper: className }} />
+))(({ theme }) => ({
+    [`& .${tooltipClasses.arrow}`]: {
+        color: theme.palette.common.black,
+    },
+    [`& .${tooltipClasses.tooltip}`]: {
+        backgroundColor: theme.palette.common.black,
+    },
+}));
 
 
 
-export default function DispalyData({setClickedItem , setInputTask, setIsUpadte, setRightBarOpen,taskDeleteLoading, setTaskDeleteLoading, setRightBarCheck, setUpdatedData, compTaskLoading,setCompTaskLoading, loadingId, setLoadingId}) {
+
+export default function DispalyData({deleteHandler,deleteOpen, handleDeleteOpen, handleDeleteClose, setCheckEnterFlage, setClickedItem , setInputTask, setIsUpadte, setRightBarOpen,taskDeleteLoading, setTaskDeleteLoading, setRightBarCheck, setUpdatedData, compTaskLoading,setCompTaskLoading, loadingId, setLoadingId}) {
 
     const dispatch = useDispatch();
     const tasks = useSelector((store) => store.InputDataReducer.tasks)
     const [taskLoading, setTaskLoading] = useState(false)
-    const [taskDeleteId, setTaskDeleteId] = useState(0)
     const [dispalyTask, setDisplayTask] = useState(true)
     const [dispalyCompTask, setDisplayCompTask] = useState(false)
     
 
 
-    // for delete dialog box
-    const [open, setOpen] = React.useState(false);
+    // // for delete dialog box
+    // const [open, setOpen] = React.useState(false);
 
-    const handleClickOpen = (item) => {
-        setOpen(true);
-        setTaskDeleteId(item.docId)
-    };
+    // const handleClickOpen = (item) => {
+    //     setOpen(true);
+    //     setTaskDeleteId(item.docId)
+    // };
 
-    const handleClose = () => {
-        setOpen(false);
-    };
+    // const handleClose = () => {
+    //     setOpen(false);
+    // };
 
 
 
@@ -114,15 +125,14 @@ export default function DispalyData({setClickedItem , setInputTask, setIsUpadte,
        
     }
 
-    const deleteHandler = () => {
-        dispatch(TaskDeleteHandler(taskDeleteId,setRightBarOpen, setTaskDeleteLoading, handleClose))
-    }
+    
 
     const updateHandler = (item) => {
         setUpdatedData(item)
         setInputTask(item.task)
         setIsUpadte(true)
         setRightBarOpen(false)
+        setCheckEnterFlage(true)
     }
     const rightBarHandler = (item) => {
         setClickedItem(item)
@@ -192,8 +202,8 @@ export default function DispalyData({setClickedItem , setInputTask, setIsUpadte,
                                 </Box>
                             </Grid>
                             <Grid item xs={3} sm ={2} sx={{ textAlign: 'right', minWidth: 'fit-content', }}>
-                                <Tooltip title="Update" placement="bottom"><IconButton aria-label="delete" color="primary" onClick={() => updateHandler(item)}> <EditIcon sx={{ fontSize: 20 }} /></IconButton></Tooltip>
-                                <DeleteConfirmation deleteHandler={deleteHandler} taskDeleteLoading={taskDeleteLoading} handleClickOpen={() => handleClickOpen(item)} handleClose={handleClose} open={open} />
+                                <BootstrapTooltipupdated title="Update" placement="bottom"><IconButton aria-label="delete" color="primary" onClick={() => updateHandler(item)}> <EditIcon sx={{ fontSize: 20 }} /></IconButton></BootstrapTooltipupdated>
+                                <DeleteConfirmation deleteHandler={deleteHandler} taskDeleteLoading={taskDeleteLoading} handleDeleteOpen ={() => handleDeleteOpen (item)} handleDeleteClose = {handleDeleteClose} deleteOpen = {deleteOpen} />
                                 {/* <Checkbox {...label}  onChange={(e)=>unCompImportantHandler(item,e.target.checked)} icon={ <Tooltip title="Mark as important" placement="bottom"><GradeOutlinedIcon/></Tooltip>} checkedIcon={<Tooltip title="Remove importance" placement="bottom"><GradeIcon /></Tooltip>} /> */}
 
                             </Grid>
@@ -216,7 +226,7 @@ export default function DispalyData({setClickedItem , setInputTask, setIsUpadte,
                                         </Box>
                                     </Grid>
                                     <Grid item xs={2} sx={{ minWidth: 'fit-content', textAlign: 'right', }}>
-                                        <DeleteConfirmation deleteHandler={deleteHandler} taskDeleteLoading={taskDeleteLoading} handleClickOpen={() => handleClickOpen(item)} handleClose={handleClose} open={open} />
+                                        <DeleteConfirmation deleteHandler={deleteHandler} taskDeleteLoading={taskDeleteLoading} handleDeleteOpen ={() => handleDeleteOpen (item)} handleDeleteClose = {handleDeleteClose}deleteOpen={deleteOpen} />
                                     </Grid>
                                 </Grid >
                             )

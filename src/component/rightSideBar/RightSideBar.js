@@ -13,7 +13,6 @@ import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 import { styled } from '@mui/material/styles';
-import DeleteIcon from '@mui/icons-material/Delete';
 import Modal from '@mui/material/Modal';
 import {
     useWindowSize,
@@ -23,6 +22,7 @@ import {
 import { useDispatch } from 'react-redux';
 import { CompTask, UnCompTask, TaskDeleteHandler } from '../../store/action/InputDataAction'
 import CircularLoading from '../circularLoading/CircularLoading';
+import DeleteConfirmation from "../deleteConfirmation/DeleteConfirmation"
 
 
 // for tooltip
@@ -48,7 +48,7 @@ const style = {
 };
 
 
-export default function RightSideBar({ clickedItem, setClickedItem, rightBarCheck, setRightBarOpen, setRightBarCheck, taskDeleteLoading, setTaskDeleteLoading, setCompTaskLoading, compTaskLoading, setLoadingId }) {
+export default function RightSideBar({deleteHandler, deleteOpen, handleDeleteOpen, handleDeleteClose, clickedItem, rightBarCheck, setRightBarOpen, setRightBarCheck, taskDeleteLoading, setCompTaskLoading, compTaskLoading, setLoadingId }) {
     const [open, setOpen] = React.useState(true);
     const handleOpen = () => setOpen(true);
     const handleClose = () => {
@@ -77,9 +77,7 @@ export default function RightSideBar({ clickedItem, setClickedItem, rightBarChec
 
         dispatch(UnCompTask(clickedItem.docId, unCompletedTaskData, setCompTaskLoading, setLoadingId, setRightBarCheck))
     }
-    const deletehandler = () => {
-        dispatch(TaskDeleteHandler(clickedItem.docId, setRightBarOpen, setTaskDeleteLoading, handleClose))
-    }
+    
 
     return (
         <>
@@ -121,7 +119,7 @@ export default function RightSideBar({ clickedItem, setClickedItem, rightBarChec
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                         <BootstrapTooltip title="Click for hide" placement='top'><IconButton aria-label="hide" onClick={handleClose}><ExitToAppIcon /></IconButton></BootstrapTooltip>
-                        {taskDeleteLoading ? <IconButton aria-label="Delete" onClick={deletehandler} sx={{ color: 'red' }}><CircularLoading /></IconButton> : <BootstrapTooltip title="Delete selected task" placement='top'><IconButton aria-label="Delete" onClick={deletehandler} sx={{ color: 'red' }}><DeleteIcon /></IconButton></BootstrapTooltip>}
+                        <Box component="span" sx={{dispaly: 'inline-block' ,pt:'4px'}}><DeleteConfirmation deleteHandler = {deleteHandler} taskDeleteLoading = {taskDeleteLoading } deleteOpen = {deleteOpen} handleDeleteOpen = {handleDeleteOpen} handleDeleteClose = {handleDeleteClose} /></Box> 
                     </Box>
                 </Box> :
                 <div>
@@ -169,8 +167,7 @@ export default function RightSideBar({ clickedItem, setClickedItem, rightBarChec
                                 </Box>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                     <BootstrapTooltip title="Click for hide" placement='top'><IconButton aria-label="hide" onClick={handleClose}><ExitToAppIcon /></IconButton></BootstrapTooltip>
-                                    {taskDeleteLoading ? <IconButton aria-label="Delete" onClick={deletehandler} sx={{ color: 'red' }}><CircularLoading /></IconButton> : <BootstrapTooltip title="Delete selected task" placement='top'><IconButton aria-label="Delete" onClick={deletehandler} sx={{ color: 'red' }}><DeleteIcon /></IconButton></BootstrapTooltip>}
-
+                                    <Box component="span" sx={{dispaly: 'inline-block' ,pt:'4px'}}><DeleteConfirmation deleteHandler = {deleteHandler} taskDeleteLoading = {taskDeleteLoading } deleteOpen = {deleteOpen} handleDeleteOpen = {handleDeleteOpen} handleDeleteClose = {handleDeleteClose} /></Box> 
 
                                 </Box>
                             </Box>

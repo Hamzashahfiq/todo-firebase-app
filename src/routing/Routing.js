@@ -5,6 +5,8 @@ import Home from '../pages/home/Home';
 import Important from '../pages/important/Important'
 import Planned from '../pages/planned/Planned';
 import Task from '../pages/task/Task';
+import PrivateRoute from './PrivateRoute';
+import Login from '../pages/auth/login/Login';
 
 export default function Routing() {
     return (
@@ -15,6 +17,7 @@ export default function Routing() {
                 <Route path="/planned" element={<Planned />} />
                 <Route path="/assigned_to_me" element={<AssignedToMe />} />
                 <Route path="/task" element={<Task />} />
+                {/* <Route path="/login" element={<Login />} /> */}
             </Routes>
         </BrowserRouter>
         

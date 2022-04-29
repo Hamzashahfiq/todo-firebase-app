@@ -118,7 +118,7 @@ export const setUpdatedData = (docId, updatedData, setInputTask, setIsUpadte, se
   try {
     await db.collection("todo").doc(docId).update(updatedData)
     setInputTask("")
-    toast.error('Successfully Updated')
+    toast.success('Successfully Updated')
     setIsUpadte(false)
     dispatch({
       type: "UPDATEHANDLER",
@@ -134,16 +134,27 @@ export const setUpdatedData = (docId, updatedData, setInputTask, setIsUpadte, se
 }
 
 
-
-export function UnImportantTask(UnImportanttaskData) {
-  return {
-    type: "UNIMPORTANT",
-    payload: UnImportanttaskData
+export const ImportantTask = (docId, ImportanttaskData,setCheckTooltipFlage,setImportantLoading) => async(dispatch) => {
+  try {
+    setImportantLoading(true)
+    await db.collection("todo").doc(docId).update(ImportanttaskData)
+    if (ImportanttaskData.important){
+      toast.success('Change to Important task')
+      setCheckTooltipFlage(true)
+    }else {
+      toast.success('Change to Unimportant task')
+      setCheckTooltipFlage(false)
+    }
+    
+    dispatch({
+      type: "IMPORTANT",
+      payload: { ...ImportanttaskData, docId }
+    })
   }
-}
-export function ImportantTask(ImportanttaskData) {
-  return {
-    type: "IMPORTANT",
-    payload: ImportanttaskData
+  catch (error) {
+    toast.error(error)
+  }
+  finally {
+    setImportantLoading(true)
   }
 }

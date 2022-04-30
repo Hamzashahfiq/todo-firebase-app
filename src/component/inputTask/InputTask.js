@@ -34,11 +34,11 @@ const BootstrapTooltip = styled(({ className, ...props }) => (
 
 
 
-export default function InputTask({checkEnterFlage, setCheckEnterFlage, inputTask, setInputTask, isUpdate, setIsUpadte, palceholder, updatedData }) {
+export default function InputTask({ importantTaskFlage, checkEnterFlage, setCheckEnterFlage, inputTask, setInputTask, isUpdate, setIsUpadte, palceholder, updatedData }) {
     const dispatch = useDispatch();
     const [submitLoadding, setSubmitLoadding] = useState(false)
     const [updatedLoading, setUpdatedLoading] = useState(false)
-   
+
 
 
     const onSubmitHandler = () => {
@@ -46,11 +46,21 @@ export default function InputTask({checkEnterFlage, setCheckEnterFlage, inputTas
             toast.info("Please add some task in input field")
             return
         }
-        let taskDetail = {
-            task: inputTask,
-            completed: false,
-            important: false
+        let taskDetail
+        if (importantTaskFlage) {
+            taskDetail = {
+                task: inputTask,
+                completed: false,
+                important: true
+            }
+        } else {
+            taskDetail = {
+                task: inputTask,
+                completed: false,
+                important: false
+            }
         }
+
         dispatch(InputDataAction(taskDetail, setInputTask, setSubmitLoadding))
     }
     const UpdateHandler = () => {
@@ -59,25 +69,25 @@ export default function InputTask({checkEnterFlage, setCheckEnterFlage, inputTas
             completed: updatedData.completed,
             important: updatedData.important
         }
-        dispatch(setUpdatedData(updatedData.docId,taskDetail, setInputTask, setIsUpadte,setUpdatedLoading))
+        dispatch(setUpdatedData(updatedData.docId, taskDetail, setInputTask, setIsUpadte, setUpdatedLoading))
         setCheckEnterFlage(false)
     }
 
-   const checkButton = (e) => {
-       if (e.key === "Enter") {
-         if(checkEnterFlage) {
-            UpdateHandler() 
-         }else{
-            onSubmitHandler()
-         }
-        
-       }
-   } 
+    const checkButton = (e) => {
+        if (e.key === "Enter") {
+            if (checkEnterFlage) {
+                UpdateHandler()
+            } else {
+                onSubmitHandler()
+            }
+
+        }
+    }
 
     return (
         <>
             <Box sx={{ width: '100%', backgroundColor: '#EAEAEA', p: 2, pb: 0, borderRadius: '5px', boxSizing: 'border-box', }}>
-                <Input placeholder={palceholder || 'Add a task'} value={inputTask} onKeyPress = {(e) => checkButton(e)} onChange={(e) => setInputTask(e.target.value)} sx={{ backgroundColor: 'white', width: '100%', p: 1, pb: 0 }} />
+                <Input placeholder={palceholder || 'Add a task'} value={inputTask} onKeyPress={(e) => checkButton(e)} onChange={(e) => setInputTask(e.target.value)} sx={{ backgroundColor: 'white', width: '100%', p: 1, pb: 0 }} />
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Box sx={{ pt: 1, px: 1, }}>
                         <IconButton aria-label="" ><BootstrapTooltip title="Add due date" arrow ><Icon sx={{ color: '#797775' }}>calendar_month</Icon></BootstrapTooltip> </IconButton>
@@ -86,8 +96,8 @@ export default function InputTask({checkEnterFlage, setCheckEnterFlage, inputTas
                     </Box>
                     <Box sx={{ mt: 2, px: 1, }}>
                         {isUpdate ?
-                            updatedLoading?<Button variant="text" sx={{ textTransform: 'none' }}><CircularLoading customStyle={{padding: '2px 8px'}} /></Button>:<Button variant="text" sx={{ textTransform: 'none' }} onClick={UpdateHandler}>Update</Button> :
-                            submitLoadding ? <Button variant="text" sx={{ textTransform: 'none' }}><CircularLoading customStyle={{padding: '2px 8px'}} /></Button> : <Button variant="text" onClick={onSubmitHandler} sx={{ textTransform: 'none' }}>Add</Button>}
+                            updatedLoading ? <Button variant="text" sx={{ textTransform: 'none' }}><CircularLoading customStyle={{ padding: '2px 8px' }} /></Button> : <Button variant="text" sx={{ textTransform: 'none' }} onClick={UpdateHandler}>Update</Button> :
+                            submitLoadding ? <Button variant="text" sx={{ textTransform: 'none' }}><CircularLoading customStyle={{ padding: '2px 8px' }} /></Button> : <Button variant="text" onClick={onSubmitHandler} sx={{ textTransform: 'none' }}>Add</Button>}
                     </Box>
                 </Box>
             </Box>

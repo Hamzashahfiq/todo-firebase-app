@@ -8,7 +8,7 @@ import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
 import { styled } from '@mui/material/styles';
 import { useSelector, useDispatch } from 'react-redux';
-import { FetchData, CompTask, UnCompTask, TaskDeleteHandler, UnImportantTask, ImportantTask } from '../../store/action/InputDataAction';
+import { FetchData, CompTask, UnCompTask, ImportantTask } from '../../store/action/InputDataAction';
 import './DisplayData.css'
 import LinearLoading from '../linearLoading/LinearLoading'
 import DeleteConfirmation from '../deleteConfirmation/DeleteConfirmation'
@@ -50,15 +50,16 @@ const BootstrapTooltipupdated = styled(({ className, ...props }) => (
 
 
 
-export default function DispalyData({ importantTaskFlage, deleteHandler, deleteOpen, handleDeleteOpen, handleDeleteClose, setCheckEnterFlage, setClickedItem, setInputTask, setIsUpadte, setRightBarOpen, taskDeleteLoading, setTaskDeleteLoading, setRightBarCheck, setUpdatedData, compTaskLoading, setCompTaskLoading, loadingId, setLoadingId }) {
+export default function DispalyData({ CompletedFlage, TaskFlage, importantTaskFlage, deleteHandler, deleteOpen, handleDeleteOpen, handleDeleteClose, setCheckEnterFlage, setClickedItem, setInputTask, setIsUpadte, setRightBarOpen, taskDeleteLoading, setTaskDeleteLoading, setRightBarCheck, setUpdatedData, compTaskLoading, setCompTaskLoading, loadingId, setLoadingId }) {
 
     const dispatch = useDispatch();
     const tasks = useSelector((store) => store.InputDataReducer.tasks)
     const [taskLoading, setTaskLoading] = useState(false)
     const [dispalyTask, setDisplayTask] = useState(true)
     const [dispalyCompTask, setDisplayCompTask] = useState(false)
-    const [checkTooltipFlage, setCheckTooltipFlage] = useState(false)
-    const [importantLoading, setImportantLoading] = useState (false)
+    const [dispalyImportantTask, setDispalyImportantTask] = useState(true)
+    const [importantLoading, setImportantLoading] = useState(false)
+    const [importantTaskId, setImportantTaskId] = useState(0)
 
     // // for delete dialog box
     // const [open, setOpen] = React.useState(false);
@@ -96,6 +97,18 @@ export default function DispalyData({ importantTaskFlage, deleteHandler, deleteO
             setDisplayCompTask(true)
         } else {
             setDisplayCompTask(false)
+        }
+
+    })
+    // for show and hide of important
+    useEffect(() => {
+        let task = tasks.filter((item) => {
+            return item.important === true && item.completed === false
+        })
+        if (task.length) {
+            setDispalyImportantTask(false)
+        } else {
+            setDispalyImportantTask(true)
         }
 
     })
@@ -150,24 +163,25 @@ export default function DispalyData({ importantTaskFlage, deleteHandler, deleteO
 
 
     const importantHandler = (item) => {
+        setImportantTaskId(item.docId)
         if (item.important === false) {
             let newImportantTask = {
                 task: item.task,
                 completed: item.completed,
                 important: true
             }
-            dispatch(ImportantTask(item.docId, newImportantTask,setCheckTooltipFlage,setImportantLoading))
-            
+            dispatch(ImportantTask(item.docId, newImportantTask, setImportantLoading))
+
         }
-        
+
         if (item.important === true) {
             let newImportantTask = {
                 task: item.task,
                 completed: item.completed,
                 important: false
             }
-            dispatch(ImportantTask(item.docId,newImportantTask,setCheckTooltipFlage,setImportantLoading))
-        
+            dispatch(ImportantTask(item.docId, newImportantTask, setImportantLoading))
+
         }
 
     }
@@ -176,34 +190,43 @@ export default function DispalyData({ importantTaskFlage, deleteHandler, deleteO
         return <LinearLoading />
     }
 
-    if (importantTaskFlage) {
+    if (TaskFlage) {
         return (
             <div>
                 <Box sx={{ px: 4, overflowY: 'auto', }} >
 
-                    {dispalyTask ? null : <Box component='h4' sx={{ my: 1 }}> Important  </Box>}
+                    {dispalyTask ? null : <Box component='h4' sx={{ my: 1 }}> Tasks  </Box>}
                     {tasks.map((item) => {
                         return (item.completed ? null :
-                            item.important &&
                             <Grid key={item.docId} className='hoverColor' container sx={{ borderBottom: 1, wordWrap: 'break-word', borderColor: '#e0e0e0', minHeight: "fit-content" }}>
 
                                 <Grid item xs={1} sx={{ minWidth: '30px', textAlign: 'right', }}>{compTaskLoading && item.docId === loadingId ? <CircularLoading customStyle={{ paddingTop: '8px', paddingRight: '8px', width: 'fit-content', float: 'right' }} /> : <BootstrapTooltip title="Mark as completed" placement="left"><Checkbox onChange={() => completedHandler(item)} sx={{ '& .MuiSvgIcon-root': { fontSize: 20 } }} /></BootstrapTooltip>}</Grid>
-                                <Grid item xs={7} sm={9} sx={{ color: 'black', textAlign: 'left' }}>
+                                <Grid item xs={5} sm={8} sx={{ color: 'black', textAlign: 'left' }}>
                                     <Box>
                                         <Button className='hoverColor' onClick={() => rightBarHandler(item)} sx={{ color: 'black', textTransform: 'none', display: 'inline-block', backgroundColor: 'inherit', border: 0, width: '100%', padding: '7px 7px', textAlign: 'left' }}>{item.task} </Button>
                                     </Box>
                                 </Grid>
-                                <Grid item xs={3} sm={2} sx={{ textAlign: 'right', minWidth: 'fit-content', }}>
+                                <Grid item xs={5} sm={3} sx={{ textAlign: 'right', minWidth: 'fit-content', }}>
+                                    {importantLoading &&
+                                        item.docId === importantTaskId ? <IconButton aria-label="delete" color="primary"> <CircularLoading /></IconButton> : <IconCheckBox check={item.important} docId={item.docId} changeHandler={() => importantHandler(item)} />}
                                     <BootstrapTooltipupdated title="Update" placement="bottom"><IconButton aria-label="delete" color="primary" onClick={() => updateHandler(item)}> <EditIcon sx={{ fontSize: 20 }} /></IconButton></BootstrapTooltipupdated>
                                     <DeleteConfirmation deleteHandler={deleteHandler} taskDeleteLoading={taskDeleteLoading} handleDeleteOpen={() => handleDeleteOpen(item)} handleDeleteClose={handleDeleteClose} deleteOpen={deleteOpen} />
+
                                 </Grid>
 
                             </Grid>
                         )
                     })
                     }
+                </Box >
+            </div >
 
-                    {/* <Box>
+        )
+    }
+    if (CompletedFlage) {
+        return (
+            <div>
+                <Box>
                     {dispalyCompTask && <Box component='h4' sx={{ mb: 1, mt: 2 }}> Completed  </Box>}
                     {
                         tasks.map((item) => {
@@ -223,8 +246,39 @@ export default function DispalyData({ importantTaskFlage, deleteHandler, deleteO
                         })
                     }
 
-                </Box> */}
+                </Box>
+            </div >
 
+        )
+    }
+
+    if (importantTaskFlage) {
+        return (
+            <div>
+                <Box sx={{ px: 4, overflowY: 'auto', }} >
+
+                    {dispalyImportantTask ? null : <Box component='h4' sx={{ my: 1 }}> Important  </Box>}
+                    {tasks.map((item) => {
+                        return (item.completed ? null :
+                            item.important &&
+                            <Grid key={item.docId} className='hoverColor' container sx={{ borderBottom: 1, wordWrap: 'break-word', borderColor: '#e0e0e0', minHeight: "fit-content" }}>
+                                <Grid item xs={1} sx={{ minWidth: '30px', textAlign: 'right', }}>{compTaskLoading && item.docId === loadingId ? <CircularLoading customStyle={{ paddingTop: '8px', paddingRight: '8px', width: 'fit-content', float: 'right' }} /> : <BootstrapTooltip title="Mark as completed" placement="left"><Checkbox onChange={() => completedHandler(item)} sx={{ '& .MuiSvgIcon-root': { fontSize: 20 } }} /></BootstrapTooltip>}</Grid>
+                                <Grid item xs={5} sm={8} sx={{ color: 'black', textAlign: 'left' }}>
+                                    <Box>
+                                        <Button className='hoverColor' onClick={() => rightBarHandler(item)} sx={{ color: 'black', textTransform: 'none', display: 'inline-block', backgroundColor: 'inherit', border: 0, width: '100%', padding: '7px 7px', textAlign: 'left' }}>{item.task} </Button>
+                                    </Box>
+                                </Grid>
+                                <Grid item xs={5} sm={3} sx={{ textAlign: 'right', minWidth: 'fit-content', }}>
+                                    {importantLoading &&
+                                        item.docId === importantTaskId ? <IconButton aria-label="delete" color="primary"> <CircularLoading /></IconButton> : <IconCheckBox check={item.important} docId={item.docId} changeHandler={() => importantHandler(item)} />}
+                                    <BootstrapTooltipupdated title="Update" placement="bottom"><IconButton aria-label="delete" color="primary" onClick={() => updateHandler(item)}> <EditIcon sx={{ fontSize: 20 }} /></IconButton></BootstrapTooltipupdated>
+                                    <DeleteConfirmation deleteHandler={deleteHandler} taskDeleteLoading={taskDeleteLoading} handleDeleteOpen={() => handleDeleteOpen(item)} handleDeleteClose={handleDeleteClose} deleteOpen={deleteOpen} />
+                                </Grid>
+
+                            </Grid>
+                        )
+                    })
+                    }
                 </Box >
             </div >
         )
@@ -248,10 +302,12 @@ export default function DispalyData({ importantTaskFlage, deleteHandler, deleteO
                                     <Button className='hoverColor' onClick={() => rightBarHandler(item)} sx={{ color: 'black', textTransform: 'none', display: 'inline-block', backgroundColor: 'inherit', border: 0, width: '100%', padding: '7px 7px', textAlign: 'left' }}>{item.task} </Button>
                                 </Box>
                             </Grid>
-                            <Grid item xs={5} sm={3} sx={{ textAlign: 'right', minWidth: 'fit-content', border:1}}>
+                            <Grid item xs={5} sm={3} sx={{ textAlign: 'right', minWidth: 'fit-content', }}>
+                                {importantLoading &&
+                                    item.docId === importantTaskId ? <IconButton aria-label="delete" color="primary"> <CircularLoading /></IconButton> : <IconCheckBox check={item.important} docId={item.docId} changeHandler={() => importantHandler(item)} />}
                                 <BootstrapTooltipupdated title="Update" placement="bottom"><IconButton aria-label="delete" color="primary" onClick={() => updateHandler(item)}> <EditIcon sx={{ fontSize: 20 }} /></IconButton></BootstrapTooltipupdated>
                                 <DeleteConfirmation deleteHandler={deleteHandler} taskDeleteLoading={taskDeleteLoading} handleDeleteOpen={() => handleDeleteOpen(item)} handleDeleteClose={handleDeleteClose} deleteOpen={deleteOpen} />
-                                {importantLoading? <CircularLoading customStyle =  {{display:'inline-block', size:'20px',padding:'8px 0px', border:'1px solid',height:'fit-content',width:'fit-content',}} /> : <IconCheckBox check = {item.important} checkTooltipFlage = {checkTooltipFlage} changeHandler = {() => importantHandler(item)} />}
+
                             </Grid>
 
                         </Grid>

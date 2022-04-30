@@ -39,6 +39,8 @@ const style = {
 
 let importantTaskFlage = true;
 
+
+
 export default function Home() {
   const [width, height] = useWindowSize()
   const [open, setOpen] = React.useState(true);  //model State
@@ -147,16 +149,16 @@ export default function Home() {
               </Box>
             </Box>
             <Box sx={{ boxSizing: 'border-box', }}>
-              <InputTask checkEnterFlage={checkEnterFlage} setCheckEnterFlage={setCheckEnterFlage} updatedData={updatedData} inputTask={inputTask} setInputTask={setInputTask} isUpdate={isUpdate} setIsUpadte={setIsUpadte} />
+              <InputTask importantTaskFlage = {importantTaskFlage} checkEnterFlage={checkEnterFlage} setCheckEnterFlage={setCheckEnterFlage} updatedData={updatedData} inputTask={inputTask} setInputTask={setInputTask} isUpdate={isUpdate} setIsUpadte={setIsUpadte} />
             </Box>
             <Box sx={{ boxSizing: 'border-box', overflow: 'auto', height: '100%' }}>
               <DisplayData importantTaskFlage = {importantTaskFlage} deleteHandler={deleteHandler} deleteOpen={deleteOpen} handleDeleteOpen={handleDeleteOpen} handleDeleteClose={handleDeleteClose} setCheckEnterFlage={setCheckEnterFlage} setClickedItem={setClickedItem} setUpdatedData={setUpdatedData} taskDeleteLoading={taskDeleteLoading} setTaskDeleteLoading={setTaskDeleteLoading} loadingId={loadingId} setLoadingId={setLoadingId} compTaskLoading={compTaskLoading} setCompTaskLoading={setCompTaskLoading} setInputTask={setInputTask} setIsUpadte={setIsUpadte} setRightBarOpen={setRightBarOpen} setRightBarCheck={setRightBarCheck} />
             </Box>
           </Box>
           {/* right side bar */}
-          {/* {rightBarOpen &&
+          {rightBarOpen &&
             <RightSideBar deleteHandler={deleteHandler} deleteOpen={deleteOpen} handleDeleteOpen={rigthBarHandleDeleteOpen} handleDeleteClose={handleDeleteClose} clickedItem={clickedItem} setClickedItem={setClickedItem} rightBarCheck={rightBarCheck} setLoadingId={setLoadingId} taskDeleteLoading={taskDeleteLoading} setTaskDeleteLoading={setTaskDeleteLoading} compTaskLoading={compTaskLoading} setCompTaskLoading={setCompTaskLoading} setRightBarCheck={setRightBarCheck} setRightBarOpen={setRightBarOpen} />
-          } */}
+          }
         </Box>
       </Box>
     </>

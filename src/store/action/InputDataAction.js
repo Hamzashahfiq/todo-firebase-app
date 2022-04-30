@@ -134,16 +134,14 @@ export const setUpdatedData = (docId, updatedData, setInputTask, setIsUpadte, se
 }
 
 
-export const ImportantTask = (docId, ImportanttaskData,setCheckTooltipFlage,setImportantLoading) => async(dispatch) => {
+export const ImportantTask = (docId, ImportanttaskData, setImportantLoading) => async(dispatch) => {
   try {
     setImportantLoading(true)
     await db.collection("todo").doc(docId).update(ImportanttaskData)
     if (ImportanttaskData.important){
       toast.success('Change to Important task')
-      setCheckTooltipFlage(true)
     }else {
       toast.success('Change to Unimportant task')
-      setCheckTooltipFlage(false)
     }
     
     dispatch({
@@ -155,6 +153,6 @@ export const ImportantTask = (docId, ImportanttaskData,setCheckTooltipFlage,setI
     toast.error(error)
   }
   finally {
-    setImportantLoading(true)
+    setImportantLoading(false)
   }
 }

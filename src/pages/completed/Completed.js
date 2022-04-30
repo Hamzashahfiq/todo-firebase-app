@@ -9,6 +9,9 @@ import { useWindowSize, useWindowWidth, useWindowHeight } from '@react-hook/wind
 import Modal from '@mui/material/Modal';
 import DisplayData from '../../component/displayData/DisplayData'
 import RightSideBar from '../../component/rightSideBar/RightSideBar';
+import { useSelector, useDispatch } from 'react-redux';
+import { TaskDeleteHandler } from '../../store/action/InputDataAction';
+
 
 
 
@@ -34,7 +37,11 @@ const style = {
   paddingTop: '60px',
 };
 
-export default function Planned() {
+let CompletedFlage = true;
+
+
+
+export default function Home() {
   const [width, height] = useWindowSize()
   const [open, setOpen] = React.useState(true);  //model State
   const [leftWindowOpen, setleftWindowOpen] = useState(width >= 800 ? true : false)
@@ -42,7 +49,34 @@ export default function Planned() {
   const [isUpdate, setIsUpadte] = useState(false)
   const [rightBarOpen, setRightBarOpen] = useState(false)
   const [rightBarCheck, setRightBarCheck] = useState(true)
+  const [updatedData, setUpdatedData] = useState("")
+  const [compTaskLoading, setCompTaskLoading] = useState(false)
+  const [loadingId, setLoadingId] = useState(false)
+  const [taskDeleteLoading, setTaskDeleteLoading] = useState(false)
+  const [clickedItem, setClickedItem] = useState("")
+  const [checkEnterFlage, setCheckEnterFlage] = useState(false)
+  const [taskDeleteId, setTaskDeleteId] = useState(0)
+  
 
+  const dispatch = useDispatch();
+
+
+  // for delete dialog box
+  const [deleteOpen, setDeleteOpen] = React.useState(false);
+
+  const handleDeleteOpen = (item) => {
+    setDeleteOpen(true);
+    setTaskDeleteId(item.docId)
+  };
+
+  const handleDeleteClose = () => {
+    setDeleteOpen(false);
+  };
+
+  const rigthBarHandleDeleteOpen = () => {
+    setDeleteOpen(true);
+    setTaskDeleteId(clickedItem.docId)
+  };
   // model Function
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
@@ -53,6 +87,10 @@ export default function Planned() {
   const leftNavbarHandler = () => {
     setleftWindowOpen(true)
     setOpen(true)
+  }
+
+  const deleteHandler = () => {
+    dispatch(TaskDeleteHandler(taskDeleteId, setRightBarOpen, setTaskDeleteLoading, handleDeleteClose))
   }
   return (
     <>
@@ -103,28 +141,26 @@ export default function Planned() {
                     <MenuIcon />
                   </IconButton>
                 </Box>}
-              <Box component='span' sx={{ paddingTop: '11px',color:'blue',  pl: 1, typography: 'h5', display: 'inline-block' }} >
-                  Planned
+              <Box component='span' sx={{ paddingTop: '11px', pl: 1, typography: 'h5', color: 'blue', display: 'inline-block' }} >
+                Completed
                 <Box component="p" sx={{ typography: 'caption', ml: 1, color: '#797775' }}>
                   {dayName}, {monthName} {currentDate}
                 </Box>
               </Box>
             </Box>
-            <Box sx={{ boxSizing: 'border-box', }}>
-              {/* <InputTask  />       */}
-              {/* input props inputTask={inputTask} setInputTask={setInputTask} isUpdate={isUpdate} setIsUpadte={setIsUpadte} */}
-            </Box>
-           {/* <Box sx={{ boxSizing: 'border-box', overflow: 'auto', height: '100%' }}>
-              <DisplayData setInputTask={setInputTask} setIsUpadte={setIsUpadte} setRightBarOpen={setRightBarOpen} setRightBarCheck={setRightBarCheck} />
+            {/* <Box sx={{ boxSizing: 'border-box', }}>
+              <InputTask  checkEnterFlage={checkEnterFlage} setCheckEnterFlage={setCheckEnterFlage} updatedData={updatedData} inputTask={inputTask} setInputTask={setInputTask} isUpdate={isUpdate} setIsUpadte={setIsUpadte} />
             </Box> */}
+            <Box sx={{ boxSizing: 'border-box', overflow: 'auto', height: '100%' }}>
+              <DisplayData CompletedFlage = {CompletedFlage} deleteHandler={deleteHandler} deleteOpen={deleteOpen} handleDeleteOpen={handleDeleteOpen} handleDeleteClose={handleDeleteClose} setCheckEnterFlage={setCheckEnterFlage} setClickedItem={setClickedItem} setUpdatedData={setUpdatedData} taskDeleteLoading={taskDeleteLoading} setTaskDeleteLoading={setTaskDeleteLoading} loadingId={loadingId} setLoadingId={setLoadingId} compTaskLoading={compTaskLoading} setCompTaskLoading={setCompTaskLoading} setInputTask={setInputTask} setIsUpadte={setIsUpadte} setRightBarOpen={setRightBarOpen} setRightBarCheck={setRightBarCheck} />
+            </Box>
           </Box>
           {/* right side bar */}
-          {/* {rightBarOpen &&
-            <RightSideBar rightBarCheck={rightBarCheck} setRightBarCheck={setRightBarCheck} setRightBarOpen={setRightBarOpen} />
-          }  */}
+          {rightBarOpen &&
+            <RightSideBar deleteHandler={deleteHandler} deleteOpen={deleteOpen} handleDeleteOpen={rigthBarHandleDeleteOpen} handleDeleteClose={handleDeleteClose} clickedItem={clickedItem} setClickedItem={setClickedItem} rightBarCheck={rightBarCheck} setLoadingId={setLoadingId} taskDeleteLoading={taskDeleteLoading} setTaskDeleteLoading={setTaskDeleteLoading} compTaskLoading={compTaskLoading} setCompTaskLoading={setCompTaskLoading} setRightBarCheck={setRightBarCheck} setRightBarOpen={setRightBarOpen} />
+          }
         </Box>
       </Box>
     </>
   )
 }
-

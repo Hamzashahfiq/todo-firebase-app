@@ -7,6 +7,8 @@ import { useSelector } from 'react-redux';
 
 export default function LeftNavbar() {
     const [taskLength , setTaskLength] = useState(0)
+    const [importantLength , setImportantLength] = useState(0)
+    const [completedLength , setCompletedLength] = useState(0)
     const tasks = useSelector((store) => store.InputDataReducer.tasks)
 
 
@@ -16,6 +18,18 @@ export default function LeftNavbar() {
         })
 
         setTaskLength(task.length)
+        
+        let importantTask = tasks.filter((item) => {
+            return item.important === true && item.completed === false
+        })
+
+        setImportantLength(importantTask.length)
+        
+        let completedTask = tasks.filter((item) => {
+            return item.completed === true
+        })
+
+        setCompletedLength(completedTask.length)
        
            
     })
@@ -35,9 +49,21 @@ export default function LeftNavbar() {
                                     <Box className='sideBarText' component='span' sx={{ mb: 1,pt:'3px', typography: 'subtitle2', mx: 6, minWidth: '100px' }}>
                                         {item.name}
                                     </Box>
-                                    <Box className='sideBarText' component='span' sx={{ mb: 1,pt:'3px', typography: 'subtitle2',}}>
+                                    <Box className='sideBarText' component='span' sx={{ mb: 1,pt:'3px', typography: 'subtitle2',color:'blue'}}>
+                                    {item.name === 'All Tasks' ?
+                                       tasks.length === 0? null : tasks.length 
+                                       :null
+                                      }
                                       {item.name === 'Task' ?
                                        taskLength === 0? null : taskLength
+                                       :null
+                                      }
+                                      {item.name === 'Important' ?
+                                       importantLength === 0? null : importantLength
+                                       :null
+                                      }
+                                      {item.name === 'Completed' ?
+                                       completedLength === 0? null : completedLength
                                        :null
                                       }
                                     </Box>
